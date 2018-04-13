@@ -1,19 +1,19 @@
-git ÀúÀå¼Ò ¸¸µé±â(ÃÊ±âÈ­)
+git ì €ì¥ì†Œ ë§Œë“¤ê¸°(ì´ˆê¸°í™”)
 git init
 
-»õ·Î¿î ÆÄÀÏÀ» Ãß°¡ÇÏ°Å³ª Á¸ÀçÇÏ´Â ÆÄÀÏ ½ºÅ×ÀÌÂ¡ÇÏ°í Ä¿¹ÔÇÏ±â
-git add <ÆÄÀÏ>
-* : ¸ğµç ÆÄÀÏ ¹× ÇÏÀ§ µğ·ºÅä¸® ÆÄÀÏ±îÁö Ä¿¹Ô
-*.* : ¸ğµç ÆÄÀÏ (ÇÏÀ§ µğ·ºÅä¸® Á¦¿Ü) Ä¿¹Ô
+ìƒˆë¡œìš´ íŒŒì¼ì„ ì¶”ê°€í•˜ê±°ë‚˜ ì¡´ì¬í•˜ëŠ” íŒŒì¼ ìŠ¤í…Œì´ì§•í•˜ê³  ì»¤ë°‹í•˜ê¸°
+git add <íŒŒì¼>
+* : ëª¨ë“  íŒŒì¼ ë° í•˜ìœ„ ë””ë ‰í† ë¦¬ íŒŒì¼ê¹Œì§€ ì»¤ë°‹
+*.* : ëª¨ë“  íŒŒì¼ (í•˜ìœ„ ë””ë ‰í† ë¦¬ ì œì™¸) ì»¤ë°‹
 
-git commit -m ¡°<¸Ş½ÃÁö>¡±
+git commit -m â€œ<ë©”ì‹œì§€>â€
 
-¼öÁ¤µÇ°í ÃßÀûµÇ´Â ¸ğµç ÆÄÀÏÀÇ º¯°æ »çÇ× Ä¿¹ÔÇÏ±â
-git commit -m ¡°<¸Ş½ÃÁö>¡± -a
+ìˆ˜ì •ë˜ê³  ì¶”ì ë˜ëŠ” ëª¨ë“  íŒŒì¼ì˜ ë³€ê²½ ì‚¬í•­ ì»¤ë°‹í•˜ê¸°
+git commit  -a -m â€œ<ë©”ì‹œì§€>â€
 
 
-github ¼­¹ö·Î ¿Ã¸®±â
-(ÃÖÃÊ »ı¼º½Ã)
+github ì„œë²„ë¡œ ì˜¬ë¦¬ê¸°
+(ìµœì´ˆ ìƒì„±ì‹œ)
 git init
 git add README.md
 git commit -m "first commit"
@@ -21,10 +21,32 @@ git remote add origin https://github.com/cotostar09/big_games.git
 git push -u origin master
 
 
-(±âÁ¸¿¡ ÀÖ´Â°É ¾÷·Îµå½Ã)
+(ê¸°ì¡´ì— ìˆëŠ”ê±¸ ì—…ë¡œë“œì‹œ)
+git commit -a -m "ì—…ë°ì´íŠ¸ ë‚´ìš©."
 git remote add origin https://github.com/cotostar09/big_games.git
 git push -u origin master
 
 
-Âü°í ÀÚ·á
+ì°¸ê³  ìë£Œ
+https://namu.wiki/w/Git
+http://emflant.tistory.com/123
+http://rogerdudler.github.io/git-guide/index.ko.html
 https://medium.com/@joongwon/git-git-%EB%AA%85%EB%A0%B9%EC%96%B4-%EC%A0%95%EB%A6%AC-c25b421ecdbd
+
+////////////////////////////////////
+
+    ERROR í•´ê²°
+    
+    
+    fatal error require_once() failed opening required php í•´ê²°
+    
+    <ë™ì ìœ¼ë¡œ ë™ì‘í•˜ê²Œ ë§Œë“œëŠ” ë²•>
+		$path_extra = dirname(dirname(dirname(__FILE__)));
+    $path = ini_get('include_path');
+    $path = $path_extra . ':' . $path;
+    ini_set('include_path', $path);
+    
+    <php.ini ìˆ˜ì •í•˜ì—¬ í•´ê²°>    
+    $path ê°’ì„ ë¯¸ë¦¬ ì €ì¥
+    vim /usr/local/php/php.ini
+    include_path = $path ì €ì¥.
