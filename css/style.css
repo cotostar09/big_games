@@ -2267,7 +2267,7 @@ h4.modal-title {
 	padding:0;
 }
 .col-md-3.widget {
-  width: 18.8%;
+  width: 48.5%;
     -webkit-transition: 0.5s all;
     -moz-transition:  0.5s all;
     -o-transition:  0.5s all;
@@ -7125,7 +7125,7 @@ h4.asd label {
 		margin-right: 10px;
 	}
 	.col-md-3.widget {
-		width: 48%;
+		width: 100%;
 		margin-right: 2%;
 		margin-bottom: 2%;
 	}
@@ -7806,12 +7806,12 @@ h4.asd label {
 		font-size: 1.4em;
 	}
 	.header-left {
-		width: 100%;
-		float:none;
+		width: 36%;
+		float:left;
 	}
 	.header-right {
-		float:none;
-		width: 100%;
+		float:right;
+		width: 62%;
 	}
 	.search-box {
 		margin: 1em 0 1em 0em;
@@ -7821,7 +7821,7 @@ h4.asd label {
 		margin-right: 2em;
 	}
 	.cbp-spmenu-push div#page-wrapper {
-		padding: 9em 1em 2em;
+		padding: 5em 1em 2em;
 	}
 	.input__label {
 		width: 90%;
@@ -8040,7 +8040,7 @@ h4.asd label {
 		padding: 5px 32px;
 	}
 	.cbp-spmenu-push div#page-wrapper {
-		padding: 8.2em 1em 1.5em;
+		padding: 5em 1em 1.5em;
 	}
 	.bs-example5 {
 		padding: 1em;

@@ -1,0 +1,30 @@
+git 저장소 만들기(초기화)
+git init
+
+새로운 파일을 추가하거나 존재하는 파일 스테이징하고 커밋하기
+git add <파일>
+* : 모든 파일 및 하위 디렉토리 파일까지 커밋
+*.* : 모든 파일 (하위 디렉토리 제외) 커밋
+
+git commit -m “<메시지>”
+
+수정되고 추적되는 모든 파일의 변경 사항 커밋하기
+git commit -m “<메시지>” -a
+
+
+github 서버로 올리기
+(최초 생성시)
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cotostar09/big_games.git
+git push -u origin master
+
+
+(기존에 있는걸 업로드시)
+git remote add origin https://github.com/cotostar09/big_games.git
+git push -u origin master
+
+
+참고 자료
+https://medium.com/@joongwon/git-git-%EB%AA%85%EB%A0%B9%EC%96%B4-%EC%A0%95%EB%A6%AC-c25b421ecdbd
