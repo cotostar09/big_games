@@ -23,7 +23,9 @@ git push -u origin master
 
 (기존에 있는걸 업로드시)
 git commit -a -m "업데이트 내용."
-git remote add origin https://github.com/cotostar09/big_games.git
+
+(최초 1회만 실행) git remote add origin https://github.com/cotostar09/big_games.git
+
 git push -u origin master
 
 

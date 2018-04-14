@@ -1950,7 +1950,7 @@ pre code {
     width: 58.33333333%;
   }
   .col-md-6 {
-    width: 50%;
+    width: 49.5%;
   }
   .col-md-5 {
     width: 41.66666667%;
@@ -2966,6 +2966,7 @@ select[multiple].form-group-lg .form-control {
   margin-right: -15px;
   margin-left: -15px;
 }
+
 @media (min-width: 768px) {
   .form-horizontal .control-label {
     padding-top: 7px;
