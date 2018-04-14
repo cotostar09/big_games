@@ -20,7 +20,7 @@
                     <i class="pull-left fa fa-dollar icon-rounded"></i>
                     <div class="stats">
                       <h5><strong>APACHE </strong></h5>
-                      <span>WINNER player - 문용민 / 서수영 / 박소엽</span><br/>
+                      <span>WINNER player - 문용민 / 서수영</span><br/>
                       <span>Total Point - 10,000</span>
                     </div>
                 </div>
@@ -70,9 +70,8 @@
         	 </div>
         	<div class="clearfix"> </div>
 		</div>
-		
 
-			
+
 		</div>
 				
 			<!-- FOR HIGH CHARTS SCRIPTS -->	

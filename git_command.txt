@@ -46,7 +46,23 @@ https://medium.com/@joongwon/git-git-%EB%AA%85%EB%A0%B9%EC%96%B4-%EC%A0%95%EB%A6
     $path = $path_extra . ':' . $path;
     ini_set('include_path', $path);
     
-    <php.ini 수정하여 해결>    
+    <php.ini 수정하여 해결>
     $path 값을 미리 저장
     vim /usr/local/php/php.ini
     include_path = $path 저장.
+
+vsftp를 사용하여 링크로 설정되어있는 경로로 이동을 하고자 할때
+550 Failed to change directory 오류 발생 하는 경우.
+
+vsftp 에서 심볼릭 링크(ln -s)로 생성된 파일경로 인식 버그인듯.
+
+# 마운트 할 디렉토리를 생성
+[sunshiny@sunshiny-net ~]$ pwd
+/home/sunshiny
+[sunshiny@sunshiny-net ~]$ mkdir tomcat
+
+# 해당 디렉토리에 마운트
+[sunshiny@sunshiny-net ~]$ mount --bind /usr/local/tomcat-6/ /home/sunshiny/tomcat/
+
+
+icon 찾는곳 : https://www.flaticon.com/
