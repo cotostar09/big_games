@@ -9,7 +9,7 @@
 							<div class="forgot-grid">
 								<label class="checkbox"><input type="checkbox" name="checkbox" checked=""><i></i>아이디 저장하기</label>
 								<div class="forgot">
-									<a href="#">비밀번호 찾기</a>
+									<!--a href="#">비밀번호 찾기</a-->  <!-- //비번찾기 기능 나중에 만들자. 메일 인증할때 -->
 								</div>
 								<div class="clearfix"> </div>
 							</div>

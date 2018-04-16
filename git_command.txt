@@ -11,6 +11,11 @@ git commit -m “<메시지>”
 수정되고 추적되는 모든 파일의 변경 사항 커밋하기
 git commit  -a -m “<메시지>”
 
+커밋 후 중간에 빠진 내용이 있을 경우
+ git commit -m “<메시지>”
+ git add forgotten_file
+ ->>>> git commit --amend
+
 
 github 서버로 올리기
 (최초 생성시)
