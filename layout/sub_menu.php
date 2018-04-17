@@ -28,7 +28,7 @@
               <ul class="sidebar-menu">
               <li class="header">관리자 메뉴</li>
               <li class="treeview">
-                <a href="?page=notice">
+                <a href="?page=dashboard">
                 <i class="fa fa-dashboard" ></i> <span>게임 현황판</span>
                 </a>
               </li>
@@ -39,7 +39,7 @@
               </li>
               <li class="treeview">
                 <a href="?page=game_screen">
-                <i class="fa fa-gears" ></i> <span>설정</span>
+                <i class="fa fa-gears" ></i> <span>유저관리</span>
                 </a>
               </li>
               </ul>

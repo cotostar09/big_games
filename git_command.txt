@@ -73,3 +73,5 @@ vsftp 에서 심볼릭 링크(ln -s)로 생성된 파일경로 인식 버그인�
 
 
 icon 찾는곳 : https://www.flaticon.com/
+
+jquery ui 예제 : http://www.w3big.com/ko/jqueryui/example-show.html

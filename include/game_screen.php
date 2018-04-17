@@ -101,7 +101,7 @@
 									</div>
 									<div class="modal-footer">
 										<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-										<button type="button" class="btn btn-primary">투자하기</button>
+										<button type="button" class="btn btn-primary">투자</button>
 									</div>
 								</div>
 							</div>
@@ -114,23 +114,23 @@
 								<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										<h4 class="modal-title" id="PHPModalLabel">PHP New message</h4>
+										<h4 class="modal-title" id="PHPModalLabel">PHP  투자하기</h4>
 									</div>
 									<div class="modal-body">
 										<form>
-											<div class="form-group">
-												<label for="recipient-name" class="control-label">Recipient:</label>
-												<input type="text" class="form-control" id="recipient-name">
+										  <div class="form-group">
+										  <label for="recipient-name" class="control-label">PLAYER NO.10 / 문용민님</label>
+											<br/>보유 POINT : 100P
 											</div>
 											<div class="form-group">
-												<label for="message-text" class="control-label">Message:</label>
-												<textarea class="form-control" id="message-text"></textarea>
+												<label for="recipient-name" class="control-label">투자POINT:</label>
+												<input type="number" class="form-control" id="recipient-name" style="width: 100%">
 											</div>
 										</form>
 									</div>
 									<div class="modal-footer">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-										<button type="button" class="btn btn-primary">Send message</button>
+										<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+										<button type="button" class="btn btn-primary">투자</button>
 									</div>
 								</div>
 							</div>
@@ -143,23 +143,23 @@
 								<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										<h4 class="modal-title" id="MySQLModalLabel">MySQL New message</h4>
+										<h4 class="modal-title" id="MySQLModalLabel">MySQL  투자하기</h4>
 									</div>
 									<div class="modal-body">
 										<form>
-											<div class="form-group">
-												<label for="recipient-name" class="control-label">Recipient:</label>
-												<input type="text" class="form-control" id="recipient-name">
+										  <div class="form-group">
+										  <label for="recipient-name" class="control-label">PLAYER NO.10 / 문용민님</label>
+											<br/>보유 POINT : 100P
 											</div>
 											<div class="form-group">
-												<label for="message-text" class="control-label">Message:</label>
-												<textarea class="form-control" id="message-text"></textarea>
+												<label for="recipient-name" class="control-label">투자POINT:</label>
+												<input type="number" class="form-control" id="recipient-name" style="width: 100%">
 											</div>
 										</form>
 									</div>
 									<div class="modal-footer">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-										<button type="button" class="btn btn-primary">Send message</button>
+										<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+										<button type="button" class="btn btn-primary">투자</button>
 									</div>
 								</div>
 							</div>

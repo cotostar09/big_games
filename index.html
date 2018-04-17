@@ -33,6 +33,8 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/modernizr.custom.js"></script>
 
+<script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+
 <!--webfonts-->
 <link href="//fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
 <!--//webfonts--> 
@@ -155,14 +157,18 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 		    //get으로 페이지를 가져오자
 		    if(isset($_GET['page'])){
 					if($_GET["page"] == 'game_screen') {
-						require_once 'include/game_screen.php';		//게임 화면
+						require_once 'include/game_screen.php';		    //게임 화면
 					} else if($_GET["page"] == 'notice') {
-						require_once 'include/notice.php';				//공지사항
+						require_once 'include/notice.php';				    //공지사항
 					} else if($_GET["page"] == 'join') {
-						require_once 'include/sing_up.php';				//회원가입
+						require_once 'include/sing_up.php';				    //회원가입
+					} else if($_GET["page"] == 'dashboard') {
+						require_once 'include/admin_dashboard.php';		//게임 현황판
 					} else if($_GET["page"] == 'login') {
-						require_once 'include/login.php';				  //로그인
+						require_once 'include/login.php';				      //로그인
 					}
+					
+					
 				}else{					
 						require_once 'include/login.php';				 //로그인(기본값)
 				}

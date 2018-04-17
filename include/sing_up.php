@@ -48,7 +48,7 @@
 <!-- // -->
 
         <div class="form-group">
-            <div class='sign-u input-group date' id='dateOfBirth'>
+            <div class='sign-u input-group date' id="dateOfBirth">
                 <input type='text' name = "dateOfBirth" placeholder="생 년 월 일" style="margin-bottom: 0px;" required=""/>
                 <div class="clearfix"> </div>
                 <span class="input-group-addon" onclick = "checkDate(<?=$timeCalSet?>);">
@@ -100,7 +100,19 @@
                 format: 'YYYY/MM/DD',
                 locale: 'ko'    //ko - 한국어, en - 영어
             });
+            
+            
+                
         });
-
+        
+        //생년월일 set 시작 날자 변경. 
+        var checkCalClick = 0;    //최초 1회 체크용 변수
+        function checkDate(yaer, month, day){
+            if(checkCalClick == 0){
+               $('#dateOfBirth').data('DateTimePicker').date(new Date(yaer,month,day,0,0,0))
+               checkCalClick++;
+            }
+        }
+        
         
     </script>

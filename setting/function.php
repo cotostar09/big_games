@@ -67,14 +67,57 @@
 		}catch(Exception $e){
 				echo "<br>&lt;SELECT ERROR&gt;  관리자에게 문의하세요! : ".$e;
 		}//SELECT count ID End
-      
-      
-      
-      
-      
-      
-      
+		
     }//function userJoin End
 
+
+ class UserDataManagment{
+      //global $db_connect;
+      
+      private $userData, $db_connect;
+      
+      function __construct($db_conn){
+        
+        $this->db_connect = $db_conn;
+        
+        $sql = " SELECT * FROM big_games.user where authCode ='U';";  //권한 유저만 SELECT
+        
+         try{
+          			$prerare = $this->db_connect->prepare($sql); 
+          			$prerare->execute();
+          			$prerare->setFetchMode(PDO::FETCH_ASSOC);
+          			$row=$prerare->fetchAll();    //결과 전체 저장
+          			
+          			$this->userData = $row;
+          			//echo "UserData 생성";
+          			
+          			//print_r($userData);
+        	}catch(Exception $e){
+        				echo "<br>&lt;INSERT ERROR&gt;  관리자에게 문의하세요! : ".$e;
+        	}//SELECT USER END
+      }    //생성자 END
+      
+      function __destruct(){
+        echo "UserData 소멸";
+        }
+      
+      
+      //전체 유저 데이터 GET
+      public function getUserData(){
+        return $this->userData;
+      }
+      //유저 데이터 총 개수 GET
+      public function countUserData(){
+        return count($this->userData);
+      }
+      
+      public function print_UserData(){
+        print_r( $this->userData );
+      }
+      
+    } //Class END
+
+	  error_reporting(E_ALL);         //에러 호출
+    ini_set("display_errors", 1);   //에러 호출
 
 ?>

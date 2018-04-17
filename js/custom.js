@@ -28,7 +28,117 @@ $(function() {
     if (element.is('li')) {
         element.addClass('active');
     }
+    
+    
+    $('#style-1').sortable({
+        cursor : 'move',    //커서 형태
+        opacity : 0.5,      //투명도
+        update: function(e, ui) {
+          $('#result').text($('#round_list').sortable('toArray'));
+        } //드래그시 동작
+      
+    });
+    //$( "#speed" ).selectmenu();
+    
 });
+
+
+//게임 라운드 설정 Class (리스트가 들어갈 DIV ID, 저장된 
+var GameTimeList = function(OName,listID,objCount,timeList) {
+    //생성자
+    this.objName = OName;
+    this.listView = document.getElementById(listID); //
+    this.listName = listID;                          //
+    this.count = objCount;                          //length
+    if(timeList != null){
+      this.list_data = timeList;                    //이전 데이터가 있으면 넣고
+    }else{
+      this.list_data = new Array();                 //없으면 안넣고
+    }
+    
+    
+    //DB에 저장된 데이터가 있으면 아이탬 추가해주는 코드 추가 해야함.
+};
+
+//아이탬 추가
+GameTimeList.prototype.appendTime = function(roundType, roundName, roundTime ){
+    this.count++;
+    
+    var newTime = document.createElement("div");
+    newTime.setAttribute("class","activity-row");
+    newTime.setAttribute("id","timeList");
+    
+    var html = "<div class='col-xs-2 activity-img'>"+roundType+"</div>"+
+    							"<div class='col-xs-6 activity-desc'>"+
+    								"<h5><a href='#'>"+roundName+"</a></h5>"+
+    								"<p>"+roundTime+" min</p>"+
+    							"</div>"+
+    							"<div class='col-xs-3 activity-desc1' style='float: right'>"+
+    							"<button type='button' class='btn btn-danger btn-flat btn-pri' onclick = '"+this.objName+".removeTime(this)' ><i class='fa fa-minus' aria-hidden='true'></i>DEL</button>"+
+    							"</div>"+
+    							"<div class='clearfix'> </div>";
+    newTime.innerHTML = html;
+    this.listView.appendChild(newTime);
+    
+
+};
+
+//아이탬 삭제
+GameTimeList.prototype.removeTime = function(idx){
+
+  var removeNode = idx.parentNode.parentNode;
+  this.listView.removeChild(removeNode);
+  this.count--;
+};
+
+//아이탬 초기화
+GameTimeList.prototype.initialsetTime = function(){
+  this.listView.innerHTML = '';
+  //this.count = 0;
+  
+    this.count = 10;
+    
+    
+    var initialValues = [ ['PLAY','1 ROUND','10',],['PLAY','2 ROUND','10',],['PLAY','3 ROUND','10',],['REST','휴식','10',],
+                         ['PLAY','4 ROUND','10',],['PLAY','5 ROUND','10',],['PLAY','6 ROUND','10',],['REST','휴식','10',],
+                         ['PLAY','7 ROUND','10',],['PLAY','8 ROUND','10',],['PLAY','9 ROUND','10',],['PLAY','10 ROUND','10',] ];
+                         
+    
+    for( var i in initialValues ){
+      var newTime = document.createElement("div");
+        newTime.setAttribute("class","activity-row");
+        newTime.setAttribute("id","timeList");
+      
+      var html = "<div class='col-xs-2 activity-img'>"+initialValues[i][0]+"</div>"+
+    							"<div class='col-xs-6 activity-desc'>"+
+    								"<h5><a href='#'>"+initialValues[i][1]+"</a></h5>"+
+    								"<p>"+initialValues[i][2]+" min</p>"+
+    							"</div>"+
+    							"<div class='col-xs-3 activity-desc1' style='float: right'>"+
+    							"<button type='button' class='btn btn-danger btn-flat btn-pri' onclick = '"+this.objName+".removeTime(this)' ><i class='fa fa-minus' aria-hidden='true'></i>DEL</button>"+
+    							"</div>"+
+    							"<div class='clearfix'> </div>";
+      newTime.innerHTML = html;
+      this.listView.appendChild(newTime);
+    }
+    
+    
+  /*
+  1R 10분2R 10분3R 10분쉬는 시간 10분 
+  4R 10분5R 10분6R 10분쉬는 시간 10분
+  7R 10분8R 10분9R 10분10R 10분
+  */
+  
+};
+
+//아이탬 Clear
+GameTimeList.prototype.resetTime = function(){
+  this.listView.innerHTML = '';
+  this.count = 0;
+  
+};
+
+
 
 
 
@@ -110,14 +220,5 @@ $(function() {
         }
     }
     
-    
-    //생년월일 set 시작 날자 변경. 
-    var checkCalClick = 0;    //최초 1회 체크용 변수
-    function checkDate(yaer, month, day){
-      if(checkCalClick == 0){
-        $('#dateOfBirth').data('DateTimePicker').date(new Date(yaer,month,day,0,0,0))
-        checkCalClick++;
-      }
-    }
     
     
