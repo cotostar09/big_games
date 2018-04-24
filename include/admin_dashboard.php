@@ -4,40 +4,44 @@
 <?php
   $userDataManag = new UserDataManagment($db_connect);
   //print_r($userDataManag->getUserData());
+  if($_SESSION["users"]["auth"] == "A"){      //관리자 로그인시
+    $gameData = new gameData($db_connect, $_SESSION["users"]["id"]);
+    //echo "start".$_SESSION["users"]["auth"];
+  }else{
+   //echo "test".$_SESSION["users"]["auth"];
+  }
 ?>
     <div class="col_1">
           <!--//게임 라운드 세팅 -->
     			<div class="col-md-4 span_8">
     				<div class="activity_box">
-    					<h2>게임 라운드 세팅</h2>
+    					<h2>게임 라운드 설정</h2>
     					<div class="scrollbar" id="style-1" class="round_list"><!--// 추가하기 버튼으로 추가-->
-
+    					<?php $gameData->viewGameTime("gameTimeSet"); ?>
 
     					</div>
-    					<form action="#" method="post">
-    					  <button type="button" class="btn btn-primary btn-flat btn-pri" onclick = "gameTimeSet.initialsetTime()"><i class="fa fa-plus" aria-hidden="true"></i>Set</button>
+    					<form action="#" method="post"  onsubmit="return false;">
+    					  <button type="button" class="btn btn-primary btn-flat btn-pri" onclick = "gameTimeSet.initialsetTime()"><i class="fa fa-plus" aria-hidden="true"></i>Default</button>
     					  <button type="button" class="btn btn-success btn-flat btn-pri" onclick = "gameTimeSet.resetTime()" ><i class="fa fa-minus" aria-hidden="true"></i>Reset</button>
     						<button type="button" class="btn btn-info btn-flat btn-pri" data-toggle="modal" data-target="#AddTimeModal" data-whatever="@mdo"><i class="fa fa-plus" aria-hidden="true"></i>Add</button>		
-    					<input type="submit" class="btn btn-info btn-flat btn-pri" value="SAVE SET"/>
+    					<input type="submit" class="btn btn-info btn-flat btn-pri" value="SET" onclick="gameStart.setRoundSetting();"/>
     					</form>
     				</div>
     			</div>
-    			<!--//게임 라운드 세팅 End -->
+    			<!--//게임 라운드 설정 End -->
 
     			<div class="col-md-4 span_8">
     				<div class="activity_box activity_box1">
-    					<h3>플레이어&nbsp; &nbsp; (0/<?=$userDataManag->countUserData()?>)</h3>
+    					<h3>플레이어 설정&nbsp; &nbsp; ( <span class="playerNum"><?=$gameData->viewPlayerNum()?></span> / <?=$userDataManag->countUserData()?> )</h3>
     					<div class="scrollbar" id="style-3" style="padding-top: 0px;">
     					<?php
     					foreach($userDataManag->getUserData() as $user){
     					  ?>
-    					  
-    					  
     					  <div class="activity-row activity-row1 inbox-page" style=" margin-bottom:0px; padding-bottom:0px; margin-top:10px; ">
           <div class="inbox-row widget-shadow" id="accordion" role="tablist" aria-multiselectable="true">
-						<div class="mail "> <input type="checkbox" class="checkbox"> </div>
+						<div class="mail"> <input type="checkbox" class="checkbox gamePlayerCB" <?php $gameData->viewCheckPlayer($user['userID'])?>  /> </div>
 						<div class="mail"><!--img src="images/i1.png" alt=""--></div>
-						<div class="mail mail-name"> <h6><?=$user['userID']?></h6> </div>
+						<div class="mail mail-name"> <h6 id = "mailAdd"><?=$user['userID']?></h6> </div>
 						<div class="mail-right dots_drop">
 							<div class="dropdown">
 								<a href="#" data-toggle="dropdown" aria-expanded="false">
@@ -71,14 +75,49 @@
 					</div>
     			</div>
                 <?php }?>
-
     					</div>
-    					<form action="#" method="post">
-    						<input type="text" value="게임 이름을 지정해주세요." onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '게임 이름을 지정해주세요.';}" required="">
-    						<input type="submit" value="GAME START"/>		
+    					<form action="#" method="post" onsubmit="return false;">
+    						<input type="text" value="유저 검색" id = "keyword" onfocus="if (this.value == '유저 검색') {this.value = '';}" onblur="if (this.value == '') {this.value = '유저 검색';}" required="">
+    						<input type="submit" id = "start_game_btn" value="SET" onclick="gameStart.setStartPlayer();"/>
     					</form>
     				</div>
     			</div>
+
+<!--//게임 설정 마무리 -->
+
+    			<div class="col-md-4 span_8">
+    				<div class="activity_box activity_box2">
+    					<h3>게임 시작</h3>
+    					<div class="scrollbar" id="style-2">
+    						<div class="activity-row activity-row1">
+    						
+    							<!--div class='col-xs-2 activity-img' id = 'roundSet'>시간<br>설정</div>
+    							<div class='col-xs-9 activity-desc'>
+    								<h5>TOTAL TIME : 12Round / 120min</h5>
+    								<p>PLAY TIME : 10Round / 100min<br>
+    								REST TIME : 2Round / 20min</p><br>
+    						  </div>
+    						  
+    						  <div class='col-xs-2 activity-img' id = 'roundSet'>인원<br>설정</div>
+    							<div class='col-xs-9 activity-desc'>
+    								<h5>플레이어 인원 : 12명&nbsp; &nbsp; &nbsp;</h5>
+    								<p><span data-toggle="modal" data-target="#viewPlayerModal" data-whatever="@mdo" > < 명단 확인 > </span></p>
+    						  </div-->
+    							<?php $gameData->viewGameSetting(); ?>
+    							<div class='clearfix'> </div>
+    						</div>
+    					</div>
+    					
+    					
+    					<form action="#" method="post" onsubmit="return false;">
+    						<input type="text" value="게임 명칭 입력" onfocus="if (this.value == '게임 명칭 입력') {this.value = '';}" onblur="if (this.value == '') {this.value = '게임 명칭 입력';}" required="">
+    						<input type="submit" value="START" onclick ="">		
+    					</form>
+    				</div>
+    				<div class="clearfix"> </div>
+    			</div>
+    			
+    			
     			
     			
     			
@@ -121,7 +160,39 @@
 									</div>
 									<div class="modal-footer">
 										<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-										<button type="button" class="btn btn-primary" onclick = "gameTimeSet.appendTime(document.getElementById('roundType').value,document.getElementById('roundName').value,document.getElementById('roundTime').value)">추가</button>
+										<button type="button" class="btn btn-primary" data-dismiss="modal" onclick = "gameTimeSet.appendTime(document.getElementById('roundType').value,document.getElementById('roundName').value,document.getElementById('roundTime').value)">추가</button>
+									</div>
+								</div>
+							</div>
+						</div>
+		<!--// 라운드 추가 Modal End-->
+		
+		
+				<!--// 라운드 추가 Modal -->
+        	<div class="modal fade" id="viewPlayerModal" tabindex="-1" role="dialog" aria-labelledby="#viewPlayerModalLabel">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										<h4 class="modal-title" id="#viewPlayerModalLabel">플레이어 명단</h4>
+									</div>
+									<div class="modal-body">
+									
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+									<div>1. 문용민 / cotostar09@naver.com / M </div>
+
+
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
 									</div>
 								</div>
 							</div>
@@ -129,6 +200,7 @@
 		<!--// 라운드 추가 Modal End-->
 		
 <script>
- var gameTimeSet = new GameTimeList("gameTimeSet","style-1",0,0);
-
+  var gameTimeSet = new GameTimeList("gameTimeSet","style-1",0,0);
+  var gameStart = new GameSetStart();
+  gameStart.checkPlayerSelNum();
 </script>

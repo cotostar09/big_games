@@ -17,7 +17,8 @@
 				<h2 class="title1">회원가입</h2>
 				<div class="sign-up-row widget-shadow">
 				<form action="include/sing_up_proc.php" method="post">
-				<h6>로그인 정보 :</h6>
+				<h6>로그인 정보 : </h6>
+				<span id = "checkIdResult">&nbsp;</span>
 					<div class="sign-u">
 								<input type="email" name = "email" class = "email" id = "check_id"  placeholder="Email Address" oninput="checkId()" required="">
 						<div class="clearfix"> </div>

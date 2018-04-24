@@ -3,6 +3,18 @@
 //collapses the sidebar on window resize.
 // Sets the min-height of #page-wrapper to window size
 $(function() {
+  
+  //게임 설정 > 플레이어 설정 > 검색 기능
+  $("#keyword").keyup(function(){
+    var keyData = $(this).val();
+    $("#style-3 > div").hide();
+    var temp = $("#style-3 > div > div:contains('"+keyData+"')");
+    $(temp).parent().show();
+  });
+  
+  
+  
+  
     $(window).bind("load resize", function() {
         topOffset = 50;
         width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
@@ -29,7 +41,7 @@ $(function() {
         element.addClass('active');
     }
     
-    
+    //게임 라운드 설정 > 드래그 엔 드롭
     $('#style-1').sortable({
         cursor : 'move',    //커서 형태
         opacity : 0.5,      //투명도
@@ -68,10 +80,10 @@ GameTimeList.prototype.appendTime = function(roundType, roundName, roundTime ){
     newTime.setAttribute("class","activity-row");
     newTime.setAttribute("id","timeList");
     
-    var html = "<div class='col-xs-2 activity-img'>"+roundType+"</div>"+
+    var html = "<div class='col-xs-2 activity-img' id = 'roundType'>"+roundType+"</div>"+
     							"<div class='col-xs-6 activity-desc'>"+
-    								"<h5><a href='#'>"+roundName+"</a></h5>"+
-    								"<p>"+roundTime+" min</p>"+
+    								"<h5><a href='#'><span id = 'roundName'>"+roundName+"</span></a></h5>"+
+    								"<p><span id = 'roundTime'>"+roundTime+"</span> min</p>"+
     							"</div>"+
     							"<div class='col-xs-3 activity-desc1' style='float: right'>"+
     							"<button type='button' class='btn btn-danger btn-flat btn-pri' onclick = '"+this.objName+".removeTime(this)' ><i class='fa fa-minus' aria-hidden='true'></i>DEL</button>"+
@@ -109,10 +121,10 @@ GameTimeList.prototype.initialsetTime = function(){
         newTime.setAttribute("class","activity-row");
         newTime.setAttribute("id","timeList");
       
-      var html = "<div class='col-xs-2 activity-img'>"+initialValues[i][0]+"</div>"+
+      var html = "<div class='col-xs-2 activity-img' id = 'roundType'>"+initialValues[i][0]+"</div>"+
     							"<div class='col-xs-6 activity-desc'>"+
-    								"<h5><a href='#'>"+initialValues[i][1]+"</a></h5>"+
-    								"<p>"+initialValues[i][2]+" min</p>"+
+    								"<h5><a href='#'><span id = 'roundName'>"+initialValues[i][1]+"<span></a></h5>"+
+    								"<p><span id = 'roundTime'>"+initialValues[i][2]+"</span> min</p>"+
     							"</div>"+
     							"<div class='col-xs-3 activity-desc1' style='float: right'>"+
     							"<button type='button' class='btn btn-danger btn-flat btn-pri' onclick = '"+this.objName+".removeTime(this)' ><i class='fa fa-minus' aria-hidden='true'></i>DEL</button>"+
@@ -131,12 +143,104 @@ GameTimeList.prototype.initialsetTime = function(){
   
 };
 
-//아이탬 Clear
+//게임 시간 테이블 아이탬 Clear
 GameTimeList.prototype.resetTime = function(){
   this.listView.innerHTML = '';
   this.count = 0;
   
 };
+
+//게임 설정 및 시작 클레스
+var GameSetStart = function() {
+  this.checkOnPlayerNum = 0;
+  this.timeTable = new Array();         //게임 시간 테이블
+  this.gamePlayerTable = new Array();   //게임 플레이어 명단
+
+};
+
+//게임 시간 테이블 저장
+GameSetStart.prototype.setRoundSetting = function(){
+  this.timeTable = new Array();         //게임 시간 테이블
+  var timeLength = $('#style-1').children().length;
+  
+  
+  for (var i = 0 ; i < timeLength ; i++) {
+    var roundType = $('#style-1').children().eq(i).find("#roundType").text()
+    var roundName = $('#style-1').children().eq(i).find("#roundName").text()
+    var roundTime = $('#style-1').children().eq(i).find("#roundTime").text()
+  	this.timeTable[i] = [roundType,roundName,roundTime];
+  }
+//  return this.timeTable;
+    $.ajax({
+            type : 'POST',
+            data : {
+                "signal" : "TIME",
+                "itemNum" : timeLength,
+                "timeTable" : this.timeTable
+            },
+            url : "./setting/ajax_set_play_data.php",
+            success : function(data) {
+              console.log(data);
+              alert("게임 라운드 설정 성공");
+            //  $('h2').css("background-color", "#aaaaaa");
+              
+              },error:function(request,status,error){
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+  
+}
+
+
+
+//게임 플레이어 인원수 
+GameSetStart.prototype.checkPlayerSelNum = function() {
+    $(".gamePlayerCB").change(function(){
+      //alert("check on box : " + $(".gamePlayerCB:checked").length );
+      this.checkOnPlayerNum = $(".gamePlayerCB:checked").length;
+      $(".playerNum").text(this.checkOnPlayerNum);
+    });
+}
+
+
+//게임 플레이어 명단 저장
+GameSetStart.prototype.setStartPlayer = function(){
+  this.gamePlayerTable = new Array();
+  var checkPlayerLength = $(".gamePlayerCB").length     //$('#style-3').contents().find("#mailAdd").length;  
+  
+  for (var i = 0 ; i < checkPlayerLength ; i++) {
+    if($(".gamePlayerCB").eq(i).is(":checked")){
+      this.gamePlayerTable[i] = $(".gamePlayerCB").eq(i).parent().parent().children().find("#mailAdd").text();
+    }
+  }
+  //return this.gamePlayerTable;
+  
+      $.ajax({
+            type : 'POST',
+            data : {
+                "signal" : "PLAYER",
+                "playerNum" : this.gamePlayerTable.length,
+                "playerlist" : this.gamePlayerTable
+            },
+            url : "./setting/ajax_set_play_data.php",
+            success : function(data) {
+              console.log(data);
+              alert("게임 참가자 설정 성공");
+              
+              },error:function(request,status,error){
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+  
+  
+}
+
+
+//게임 시작 함수
+GameSetStart.prototype.startGame = function() {
+  
+  
+}
 
 
 
@@ -165,25 +269,33 @@ GameTimeList.prototype.resetTime = function(){
                     //$(".signupbtn").prop("disabled", true);
                     //$(".signupbtn").css("background-color", "#aaaaaa");
                     $("#check_id").css("background-color", "#FFFFFF");
+                    $("#checkIdResult").html('&nbsp;');
                     idCheck = 0;
-                } else if (inputed.match(regExp) == null) { //E-mail 형식 확인
+                } else if (inputed.match(regExp) == null) { //E-mail 형식 확인 ERR
                   
                   $("#check_id").css("background-color", "#FFCECE");
+                  $("#checkIdResult").text('E-mail 형식이 아닙니다.');
+                  $("#checkIdResult").css("color", "##DF0101");
                   
                 }else if (data == 0) {// 중복아님 확정.
                   //alert('중복ㄴㄴ');
                     $("#check_id").css("background-color", "#B0F6AC");
+                    $("#checkIdResult").text('사용 가능한 E-mail 입니다.');
+                    $("#checkIdResult").css("color", "##04B404");
                     idCheck = 1;
                     if(idCheck==1 && pwdCheck == 1) {
                         //$(".signupbtn").prop("disabled", false);
                         //$(".signupbtn").css("background-color", "#4CAF50");
                         //signupCheck();
+                        
                     } 
                 } else if (data == 1) {// 중복
                     //$(".signupbtn").prop("disabled", true);
                     //$(".signupbtn").css("background-color", "#aaaaaa");
                     $("#check_id").css("background-color", "#FFCECE");
                     idCheck = 0;
+                    $("#checkIdResult").text('이미 등록된 E-mail 입니다.');
+                    $("#checkIdResult").css("color", "##DF0101");
                 } 
             },error:function(request,status,error){
                 alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);

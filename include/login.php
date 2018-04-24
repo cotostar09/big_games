@@ -1,9 +1,11 @@
+		
 		<div id="page-wrapper">
 			<div class="main-page login-page ">
 				<h2 class="title1">로그인</h2>
 				<div class="widget-shadow">
 					<div class="login-body">
-						<form action="#" method="post">
+						<form action="setting/auth_manage.php" method="post">
+						  <span class="checkJoinOk"></span>
 							<input type="email" class="user" name="email" placeholder="E-mail" required="">
 							<input type="password" name="password" class="lock" placeholder="비밀번호" required="">
 							<div class="forgot-grid">
@@ -25,3 +27,20 @@
 				</div>
 			</div>
 		</div>
+		<script>
+		//$(".checkJoinOk").text("회원가입을 축하합니다.");
+		$(window).load(function () {
+		  
+       <?php
+       if(!strcmp($_SESSION["action"] ,"joinOk")){?>
+
+       $('.checkJoinOk').text('회원가입을 축하합니다.');
+       $('.user').val('<?=$_SESSION["newID"]?>')
+
+      <?php
+        $_SESSION["action"] = "";
+        $_SESSION["newID"]="";
+       }?>
+       
+    });
+		</script>

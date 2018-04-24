@@ -1,8 +1,9 @@
 <?php
+    include_once 'setting/session_manage.php';
     include_once 'setting/db_connect.php';
     include_once 'setting/function.php';
-    //include_once 'setting/session_manage.php';
     
+    if(isset($_GET['logout']) && $_GET['logout'] == 'yes') logout();
 ?>
 
 <!DOCTYPE HTML>
@@ -37,7 +38,7 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 
 <!--webfonts-->
 <link href="//fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
-<!--//webfonts--> 
+<!--//webfonts-->
 
 <!-- Metis Menu -->
 <script src="js/metisMenu.min.js"></script>
@@ -64,10 +65,11 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 				<!--toggle button end-->
 				<div class="profile_details_left">
 				<!--notifications of menu start -->
+				
 					<ul class="nofitications-dropdown">
-						
 						<li class="dropdown head-dpdn">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-bell"></i><span class="badge blue">4</span></a>
+							<?php if(isset($_SESSION["users"]["auth"])){ ?>
 							<ul class="dropdown-menu">
 								<li>
 									<div class="notification_header">
@@ -113,23 +115,36 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 								</li>
 							</ul>
 						</li>	
-						
+						<?php } ?>
 					</ul>
 					<div class="clearfix"> </div>
+					
 				</div>
 				<!--notification menu end -->
 				<div class="clearfix"> </div>
 			</div>
 			<div class="header-right">
+			
+			<?php if(isset($_SESSION["users"]["auth"])){ ?>
 				<div class="profile_details">		
 					<ul>
 						<li class="dropdown profile_details_drop">
+						
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 								<div class="profile_img">	
-									<span class="prfil-img"><img src="images/2.jpg" alt=""> </span> 
+									<span class="prfil-img"><img src="" alt=""> </span> 
 									<div class="user-name">
-										<p>문용민</p>
-										<span>Administrator</span>
+										<p><?=$_SESSION["users"]["name"]?></p>
+										<span> 
+										
+										<?php 
+										if($_SESSION["users"]["auth"] == "U"){
+										  echo "Player";
+										}else if($_SESSION["users"]["auth"] == "A"){
+										  echo "Administrator";
+										}
+										?>
+										</span>
 									</div>
 									<i class="fa fa-angle-down lnr"></i>
 									<i class="fa fa-angle-up lnr"></i>
@@ -140,15 +155,18 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 								<li> <a href="#"><i class="fa fa-cog"></i> Settings</a> </li> 
 								<li> <a href="#"><i class="fa fa-user"></i> My Account</a> </li> 
 								<li> <a href="#"><i class="fa fa-suitcase"></i> Profile</a> </li> 
-								<li> <a href="#"><i class="fa fa-sign-out"></i> Logout</a> </li>
+								<li> <a href="?logout=yes"><i class="fa fa-sign-out"></i> Logout</a> </li>
 							</ul>
 						</li>
 					</ul>
 				</div>
 				
+				<div class="clearfix"> </div>
+				<?php } ?>
 				
-				<div class="clearfix"> </div>				
 			</div>
+			
+			
 			<div class="clearfix"> </div>	
 		</div>
 		<!-- //header-ends -->
@@ -156,6 +174,7 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 		<?php
 		    //get으로 페이지를 가져오자
 		    if(isset($_GET['page'])){
+		      //페이지 이동화면 -> 권한별로 설정 변경 할것.
 					if($_GET["page"] == 'game_screen') {
 						require_once 'include/game_screen.php';		    //게임 화면
 					} else if($_GET["page"] == 'notice') {
@@ -169,8 +188,16 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 					}
 					
 					
-				}else{					
-						require_once 'include/login.php';				 //로그인(기본값)
+				}else{
+				    //기본 화면
+				    if(!isset($_SESSION["users"]["auth"])){
+				      require_once 'include/login.php';				        //로그인(기본값)
+				    }else if($_SESSION["users"]["auth"] == "U") {
+				      require_once 'include/game_screen.php';				  //게임화면(기본값)
+				    }else if($_SESSION["users"]["auth"] == "A") {
+				      require_once 'include/admin_dashboard.php';			//게임 현황판(기본값)
+				    }
+						
 				}
 		?> 
 		
@@ -214,11 +241,14 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 	<script src='js/SidebarNav.min.js' type='text/javascript'></script>
 	<script>
       $('.sidebar-menu').SidebarNav()
+      
+     
+
     </script>
 	<!-- //side nav js -->
 		
 	<!-- Bootstrap Core JavaScript -->
-   <script src="js/bootstrap.js"> </script>
+   <script src="js/bootstrap.js">    </script>
 	<!-- //Bootstrap Core JavaScript -->
 	<?php
 	  error_reporting(E_ALL);         //에러 호출
