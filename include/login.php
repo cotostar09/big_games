@@ -32,7 +32,7 @@
 		$(window).load(function () {
 		  
        <?php
-       if(!strcmp($_SESSION["action"] ,"joinOk")){?>
+       if(isset($_SESSION["action"])&&!strcmp($_SESSION["action"] ,"joinOk")){?>
 
        $('.checkJoinOk').text('회원가입을 축하합니다.');
        $('.user').val('<?=$_SESSION["newID"]?>')

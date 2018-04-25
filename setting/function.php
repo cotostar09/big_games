@@ -193,6 +193,8 @@
     
     //게임 데이터, 게임 시간 데이터, 플레이어 명단 데이터
     private $gameData, $gameTime, $playerList;
+    
+    private $viewPage;
       
     //생성자(DB객체, 관리자 계정)
     function __construct($db_conn, $aId){
@@ -202,6 +204,7 @@
       $readyOK;
       
       //클래스 생성할때 게임 세팅 데이터(gameSetDataBV) 에 준비중인 게임이 있는가 확인해야함!!!!
+      //게임을 플레이 하고 있다면 생성 ㄴㄴ 
       //없다면 준비중인 게임 하나 만들어주자!!
       $readyOK_sql = "SELECT count(gameStatus) as readyOK from gameSetDataBV where gameStatus = :readyStatus or gameStatus like :playStatus and setAdmin = :adminId;";
       try{
@@ -231,7 +234,23 @@
         }catch(Exception $e){
           	echo "<br>&lt;INSERT ERROR&gt;  관리자에게 문의하세요! : ".$e;
         } //INSERT gameSetData END
-      }   //INSERT gameSetData END (IF)
+      
+      }else{    //있다면 뒤에 화면 안보임
+          $readyOK_sql = "SELECT count(gameStatus) as playOK from gameSetDataBV where gameStatus like :playStatus and setAdmin = :adminId;";
+          $prerare = $this->db_connect->prepare($readyOK_sql); 
+       	  $prerare->bindValue(':playStatus',"P%", PDO::PARAM_STR);
+          $prerare->bindValue(':adminId',$this->adminId , PDO::PARAM_STR);
+      		$prerare->execute();
+      		$prerare->setFetchMode(PDO::FETCH_ASSOC);
+      		$row=$prerare->fetch();
+
+      		$playOK = $row["playOK"];
+      		if($playOK == 1){
+      		  //require_once 'include/admin_dashboard.php';
+      		  $this->viewPage = "admin_dashboard";
+            return 0;
+      		}
+      }   
       
       
       //gameData SELECT ==> $gameData에 저장.
@@ -245,12 +264,24 @@
       		$row=$prerare->fetch();
 
       		$this->gameData = $row;
+      		
+      		//require_once 'include/admin_game_setting.php';
+      		$this->viewPage = "admin_game_setting";
 
       }catch(Exception $e){
       		echo "<br>&lt;SELECT ERROR&gt;  관리자에게 문의하세요! : ".$e;
       }//SELECT readyOK END
 
     }     // 생성자 END
+    
+    function getViewPage(){
+      return $this->viewPage;
+    }
+    
+    //현재 설정중인 게임 회차를 담은 hidden DIV 생성
+    function createGameEpisode(){
+      echo "<div id='gameEpisode' style='display:none;'>".$this->gameData["gameEpisode"]."</div>";
+    }     //createGameEpisode END
 
     //게임 시간 INSERT gameTimeTableDataBV
     function insertGameTime($gameTimeData){
@@ -264,6 +295,13 @@
       }catch(Exception $e){
         	echo "<br>&lt;DELETE ERROR&gt;  관리자에게 문의하세요! : ".$e;
       } //DELETE gameTimeTableDataBV END
+      
+      if($gameTimeData == 0){
+        $inHtml = "<h5>TOTAL TIME : 0 Round / min</h5>".
+        								"<p>PLAY TIME : 0 Round / min<br>REST TIME : 0 Round / min</p><br>";
+        	echo $inHtml;
+        	return 0;
+      }
       
     //$sql = "INSERT INTO `big_games`.`gameSetDataBV` (gameStatus, setAdmin)"." VALUES (:gameStatus,:setAdminId);";
       $sql = "INSERT INTO `big_games`.`gameTimeTableDataBV` (gameEpisode, orders, types, times, gameRound)"." VALUES (:episode, :orders, :types, :times, :gameRound); ";
@@ -285,6 +323,20 @@
            $prerare->execute();
          
          }
+         
+          $totalRound = $this->viewSumTime("TOTAL","ROUND");
+      
+          $totalTime = $this->viewSumTime("TOTAL","TIME");
+          
+          $playRound = $this->viewSumTime("PLAY","ROUND");
+          $playTime = $this->viewSumTime("PLAY","TIME");
+          
+          $restRound = $this->viewSumTime("REST","ROUND");
+          $restTime = $this->viewSumTime("REST","TIME");
+          
+          $inHtml = "<h5>TOTAL TIME : ".$totalRound." Round / ".$totalTime."min</h5>".
+        								"<p>PLAY TIME : ".$playRound." Round / ".$playTime."min<br>REST TIME : ".$restRound." Round / ".$restTime."min</p><br>";
+        	echo $inHtml;
 
       }catch(Exception $e){
         	echo "<br>&lt;INSERT ERROR&gt;  관리자에게 문의하세요! : ".$e;
@@ -309,9 +361,15 @@
         	echo "<br>&lt;DELETE ERROR&gt;  관리자에게 문의하세요! : ".$e;
       } //DELETE userGameInfoBV END
       
-      if($playerListData == null){
-        return 0;
+      if($playerListData == 0){
+          $inHTML ="플레이어 인원 : 0명&nbsp; &nbsp; &nbsp;";
+           
+           $inModal = "<div>참가 플레이어가 없습니다.<br>참가 플레이어를 설정해주세요.</div>";
+           
+           echo "{\"inHTML\":\"".$inHTML."\", \"inModal\":\"".$inModal."\"}";
+        	return 0;
       }
+      
       
       $sql ="INSERT INTO userGameInfoBV(gameEpisode, playerCode, userID) VALUES (:episode, :playerCode, :userId); ";
 
@@ -329,7 +387,16 @@
 
            
            $prerare->execute();
+           
          }
+         
+         $playerNum = $this->viewPlayerNum();
+           
+           $inHTML ="플레이어 인원 : ".$playerNum."명&nbsp; &nbsp; &nbsp;";
+           
+           $inModal = $this->viewPlayerList();
+           
+           echo "{\"inHTML\":\"".$inHTML."\", \"inModal\":\"".$inModal."\"}";
 
       }catch(Exception $e){
         	echo "<br>&lt;INSERT ERROR&gt;  관리자에게 문의하세요! : ".$e;
@@ -412,7 +479,7 @@
       } //SELECT userGameInfoBV END
     }   //viewPlayerNum END
     
-    
+    // 게임 시작 부분 데이터 주입
     function viewGameSetting(){
       $totalRound = $this->viewSumTime("TOTAL","ROUND");
       
@@ -427,14 +494,14 @@
       $playerNum = $this->viewPlayerNum();
       
       $inHtml = "<div class='col-xs-2 activity-img' id = 'roundSet'>시간<br>설정</div>".
-    							"<div class='col-xs-9 activity-desc'>".
-    								"<h5>TOTAL TIME : ".$totalRound."Round / ".$totalTime."min</h5>".
-    								"<p>PLAY TIME : ".$playRound."Round / ".$playTime."min<br>REST TIME : ".$restRound."Round / ".$restTime."min</p><br>".
+    							"<div class='col-xs-9 activity-desc' id='viewRounds'>".
+    								"<h5>TOTAL TIME : ".$totalRound." Round / ".$totalTime."min</h5>".
+    								"<p>PLAY TIME : ".$playRound." Round / ".$playTime."min<br>REST TIME : ".$restRound." Round / ".$restTime."min</p><br>".
     						  "</div>".
     						  "<div class='col-xs-2 activity-img' id = 'roundSet'>인원<br>설정</div>".
     							"<div class='col-xs-9 activity-desc'>".
-    								"<h5>플레이어 인원 : ".$playerNum."명&nbsp; &nbsp; &nbsp;</h5>".
-    								"<p><span data-toggle='modal' data-target='#viewPlayerModal' data-whatever='@mdo' > < 명단 확인 > </span></p>".
+    								"<h5 id='viewPlayers'>플레이어 인원 : ".$playerNum."명&nbsp; &nbsp; &nbsp;</h5>".
+    								"<p><span data-toggle='modal' data-target='#viewPlayerModal' data-whatever='@mdo' > < 플레이어 명단 확인 > </span></p>".
     						  "</div>";
     	echo $inHtml;
       
@@ -491,15 +558,281 @@
       
     }   //viewSumTime END
     
+    //플레이어 명단 모달 부분 데이터 주입
+    function viewPlayerList(){
+      $sql = "SELECT user.userID as playerID, user.name as playerName, user.sex as playerSex FROM `big_games`.`userGameInfoBV` INNER JOIN `big_games`.`user`  ON `userGameInfoBV`.userID = `user`.userID WHERE `userGameInfoBV`.gameEpisode = :episode;";
+      
+      if($this->viewPlayerNum() == 0){
+        echo "<div>참가 플레이어가 없습니다.<br>참가 플레이어를 설정해주세요.</div>";
+        return;
+      }
+      
+      try{
+         $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':episode',$this->gameData['gameEpisode'], PDO::PARAM_INT);
+         
+         $prerare->execute();
+
+         $prerare->setFetchMode(PDO::FETCH_ASSOC);
+  		   //$row=$prerare->fetchAll();    //결과 전체 저장
+  	  	 $row=$prerare->fetch();         //결과 한줄씩 저장
+  	  	 
+  	  	 $countInt = 0;
+  	  	 $inModal = "";
+  	  	 do{
+  	  	   $countInt++;
+  	  	   if($row["playerSex"] == "Male") {
+  	  	     $playerSexKor = "남성";
+  	  	   }else if($row["playerSex"] == "Female") {
+  	  	     $playerSexKor = "여성";
+  	  	   }
+  	  	  
+  	  	   
+  	  	   $data = $countInt.". ".$row["playerID"]." / ".$row["playerName"]." / ".$playerSexKor;
+  	  	   $inModal = $inModal."<div>".$data."</div>";
+  	  	  }while($row=$prerare->fetch());     //while END
+  	  	 return $inModal;
+         
+      }catch(Exception $e){
+        echo "<br>&lt;SELECT ERROR&gt;  관리자에게 문의하세요! : ".$e;
+      }
+    }   //viewPlayerList END
+    
+    
+    
+    
+    
+    /* 게임 시작 함수 gameStart(input : 게임 명칭)
+    ** 1. 게임 시작 전 검사
+    **   - 게임 상태 코드가 준비 코드인가?
+    **   - 플레이어 수가 충분 한가?     > 최저인원 : 8명?
+    **   - 게임 플레이 타임이 적절한가? > 최저라운드 : 5R ?
+    **   - 
+    ** 2. 게임 준비
+    **   - 1라운드의 시간을 검색 후 gameSetDataBV 테이블에 맞는 게임 회차를 찾고 endRoundTime에 현재 타임스템프에서 1라운드의 시간을 추가해서 입력
+    **   - 게임 상태 코드 'P'로 변경 + 현재 라운드 1로 변경
+    **   - userGameInfoBV 테이블에서 맞는 게임 회차 플레이어들을 찾고 playCode를 'P'로 일괄 변경.
+    **   - userGameInfoBV 테이블에서 맞는 게임 회차 플레이어들을 찾고 Point를 '50'으로 일괄 변경.
+    ** 
+    ** 
+    */
+    
+    
+    //게임 시작 함수
+    function gameStart($gameCode){
+      if($this->gameData["gameStatus"]!="R"){
+        //echo "{\"returnCode\":\"".$inHTML."\", \"inModal\":\"".$inModal."\"}";
+        echo "{\"returnCode\":\"gameStatusErr\"}";
+        return 0;
+      }//게임 상태 코드가 준비 코드인가?
+      
+      $totalRound = $this->viewSumTime("TOTAL","ROUND");
+      $playerNum = $this->viewPlayerNum();
+      
+      if($totalRound < 8){
+        echo "{\"returnCode\":\"minRoundErr\"}";
+        return 0;
+      }//게임 플레이 타임이 적절한가?
+      
+      if($playerNum < 5){
+        echo "{\"returnCode\":\"minPlayerErr\"}";
+        return 0;
+      }//플레이어 수가 충분 한가? 
+      
+      $sql = "SELECT orders, types, times, gameRound FROM `big_games`.`gameTimeTableDataBV` where gameEpisode = :episode and orders = :orders";
+      try{
+         $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':episode',$this->gameData['gameEpisode'], PDO::PARAM_INT);
+         $prerare->bindValue(':orders',"1", PDO::PARAM_INT);
+         
+         $prerare->execute();
+
+         $prerare->setFetchMode(PDO::FETCH_ASSOC);
+  		   //$row=$prerare->fetchAll();    //결과 전체 저장
+  	  	 $row=$prerare->fetch();         //결과 한줄씩 저장
+  	  	 
+  	  	 $round1 = $row;
+  	  	 
+  	  	 //$datetimeKor = new DateTime('now', new DateTimeZone('Asia/Seoul));
+  	  	 //$timestamp = $datetimeKor->getTimestamp();
+  	  	 
+  	  	 //$timestamp = time();   //이거 이상함;; 9시간 전꺼 나옴
+  	  	 //$roundTimestamp = $timestamp;
+  	  	 //$roundTimestamp = $timestamp + (60*$round1["times"]);
+         //$roundTime = date("Y-m-d H:i:s");//gmdate("Y-m-d H:i:s", $roundTimestamp);
+         //$roundTime = strtotime("+".$round1["times"]." minutes");
+         
+         
+         $timestamp = strtotime("+".$round1["times"]." minutes");   //정상적으로 나옴
+         $roundTime = date("Y-m-d H:i:s", $timestamp);
+  	  	 
+  	  	 $sql = "UPDATE gameSetDataBV SET gameCode=:gameCode, gameStatus = :playStatus, nowRound=:firstOrder, endRoundTime=:roundTime WHERE gameEpisode = :episode";
+  	  	 $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':episode',$this->gameData['gameEpisode'], PDO::PARAM_INT);
+          
+         $prerare->bindValue(':gameCode',$gameCode, PDO::PARAM_STR);
+         $prerare->bindValue(':playStatus',"P", PDO::PARAM_STR);
+         $prerare->bindValue(':firstOrder',"1", PDO::PARAM_INT);
+         $prerare->bindValue(':roundTime',$roundTime, PDO::PARAM_STR);
+  	  	 $prerare->execute();
+  	  	 
+  	  	 $sql = "UPDATE userGameInfoBV SET point=:setPoint, playCode = :setPlayCode WHERE gameEpisode = :episode";
+  	  	 $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':episode',$this->gameData['gameEpisode'], PDO::PARAM_INT);
+         
+         $prerare->bindValue(':setPoint',"50", PDO::PARAM_INT);
+  	  	 $prerare->bindValue(':setPlayCode',"P", PDO::PARAM_STR);
+  	  	 $prerare->execute();
+  	  	 
+  	  	 echo "{\"returnCode\":\"gameStartOK\"}";
+      }catch(Exception $e){
+        	echo "{\"returnCode\":\"".$e."\"}";
+      }
+        
+    }     //gameStart END
+    
     
     
     
   }     //Class END
   
   
+  
+  
+  
+  //게임 플레이 - 관리자
+  Class gamePlayAdmin{
+    function __construct($db_conn, $aId){
+      
+    }
+    
+  }     //Class END
+  
+  
+  //게임 플레이 유저
+  Class GamePlay{
 
+    private $db_connect, $userId;
+    
+    private $isPlaying, $playerData, $gameRoundData;
+
+    function __construct($db_conn, $ids){
+      $this->db_connect = $db_conn;
+      $this->userId = $ids;
+      
+      $sql = "SELECT count(playCode) as isPlaying FROM userGameInfoBV where userID = :playerId AND playCode = :playCode";
+      
+      try{
+         $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':playerId',$ids , PDO::PARAM_STR);
+         $prerare->bindValue(':playCode',"P", PDO::PARAM_STR);
+         
+         $prerare->execute();
+
+         $prerare->setFetchMode(PDO::FETCH_ASSOC);
+  		   //$row=$prerare->fetchAll();    //결과 전체 저장
+  	  	 $row=$prerare->fetch();         //결과 한줄씩 저장
+  	  	 
+  	  	 $this->isPlaying = $row["isPlaying"];
+  	  	 
+  	  	 //게임 플레이 중이 아니라면 여기서 종료.
+  	  	 if($this->isPlaying == 0){
+  	  	    return 0;
+  	  	 }
+  	  	 
+  	  	 $sql = "SELECT user.userID, user.name , userGameInfoBV.playerCode, userGameInfoBV.point, userGameInfoBV.rightsA, userGameInfoBV.rightsB, userGameInfoBV.rightsC, userGameInfoBV.gameEpisode FROM user JOIN userGameInfoBV ON userGameInfoBV.userID = user.userID where user.userID = :playerId AND userGameInfoBV.playCode = :playCode;";
+  	  	 $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':playerId',$ids , PDO::PARAM_STR);
+         $prerare->bindValue(':playCode',"P", PDO::PARAM_STR);
+         
+         $prerare->execute();
+
+         $prerare->setFetchMode(PDO::FETCH_ASSOC);
+  		   //$row=$prerare->fetchAll();    //결과 전체 저장
+  	  	 $this->playerData = $prerare->fetch();  //플레이어 데이터 저장
+  	  	 
+  	  	 
+  	  	 return 1;
+  	  }catch(Exception $e){
+        	echo "{\"returnCode\":\"".$e."\"}";
+      }
+
+    }   //생성자END
+    
+    
+    //현재 라운드 정보 저장
+    function getNowRoundTime(){
+      $sql = "SELECT gameSetDataBV.gameEpisode, gameTimeTableDataBV.orders , gameSetDataBV.endRoundTime, gameTimeTableDataBV.types, gameTimeTableDataBV.gameRound  as gameRoundName FROM gameSetDataBV JOIN gameTimeTableDataBV ON gameSetDataBV.nowRound = gameTimeTableDataBV.orders and gameSetDataBV.gameEpisode = gameTimeTableDataBV.gameEpisode WHERE gameSetDataBV.gameEpisode=:episode;";
+      try{
+         $prerare = $this->db_connect->prepare($sql);
+         $prerare->bindValue(':episode',$this->playerData["gameEpisode"] , PDO::PARAM_INT);
+
+         $prerare->execute();
+
+         $prerare->setFetchMode(PDO::FETCH_ASSOC);
+  		   //$row=$prerare->fetchAll();                       //결과 전체 저장
+  	  	 $this->gameRoundData = $prerare->fetch();         //결과 한줄씩 저장
+
+  	  	 return $this->gameRoundData;
+  	  	 
+  	  }catch(Exception $e){
+  	    $arr = array( 'Error' => $e );
+  	    return $arr;
+      }
+    }       //GetNowRoundTime END
+
+    //플레이어 기본 정보 GET
+    function getPlayerData(){
+      return $this->playerData;
+    }     //getPlayerData END
+    
+    //게임 참가 여부 GET
+    function getIsPlaying(){
+      return $this->isPlaying;
+    }     //getIsPlaying END
+    
+    //현재 라운드 정보 GET
+    function getGameRoundData(){
+      return $this->gameRoundData;
+    }     //getGameRoundData END
+    
+    
+    //투자하기 ( 투자 회사, 투자 포인트)
+    function investcompany($investCom, $investPoint){
+      //1. 현재 라운드 찾기 및 시간오버 체크 -> 투자가능 시간이 아니라면 Fail
+      //2. 잔여 포인트와 투자 포인트 비교 -> 투자 > 잔여 라면 Fail
+      //3. 중복투자 체크 - 1라운드에는 1번 투자 가능.
+      //4. 투자하기
+      
+      $this->getNowRoundTime();
+      $timestampNow = strtotime("Now");                               //현재 시간 타임스템프
+      $timestampRE = strtotime($this->gameRoundData["endRoundTime"]); //라운드 종료 시간
+      
+      if($timestampNow > $timestampRE){
+        return "{\"returnCode\":\"overTime\"}";
+      } //라운드 시간 비교
+      
+      if($investPoint > $this->playerData["point"]){
+        return "{\"returnCode\":\"overCost\"}";
+      } //투자 Point 비교
+      
+      if($investPoint <= 0){
+        return "{\"returnCode\":\"underCost\"}";
+      } //투자 Point 비교
+
+      //투자하는 SQL 문
+      $sql = "INSERT INTO gamePlayDataBV (userID, gameEpisode, gameRound, investCom, investMoney, investTime )".
+          " VALUES (:userID,:gameEpisode, :gameRound, :investCom, :investMoney, :investTime);";
+
+      return "{\"returnCode\":\"investOK\"}";
+    }   //investcompany END
+
+  }     //Class END
 
 
   error_reporting(E_ALL);         //에러 호출
   ini_set("display_errors", 1);   //에러 호출
+
+
+
 ?>

@@ -12,9 +12,6 @@ $(function() {
     $(temp).parent().show();
   });
   
-  
-  
-  
     $(window).bind("load resize", function() {
         topOffset = 50;
         width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
@@ -110,8 +107,8 @@ GameTimeList.prototype.initialsetTime = function(){
   
     this.count = 10;
     
-    
-    var initialValues = [ ['PLAY','1 ROUND','10',],['PLAY','2 ROUND','10',],['PLAY','3 ROUND','10',],['REST','휴식','10',],
+    //TEST -  1라운드를 2분으로 조정
+    var initialValues = [ ['PLAY','1 ROUND','2',],['PLAY','2 ROUND','10',],['PLAY','3 ROUND','10',],['REST','휴식','10',],
                          ['PLAY','4 ROUND','10',],['PLAY','5 ROUND','10',],['PLAY','6 ROUND','10',],['REST','휴식','10',],
                          ['PLAY','7 ROUND','10',],['PLAY','8 ROUND','10',],['PLAY','9 ROUND','10',],['PLAY','10 ROUND','10',] ];
                          
@@ -161,7 +158,7 @@ var GameSetStart = function() {
 //게임 시간 테이블 저장
 GameSetStart.prototype.setRoundSetting = function(){
   this.timeTable = new Array();         //게임 시간 테이블
-  var timeLength = $('#style-1').children().length;
+  var timeLength = $('#style-1').children().length; //Round 횟수
   
   
   for (var i = 0 ; i < timeLength ; i++) {
@@ -179,17 +176,16 @@ GameSetStart.prototype.setRoundSetting = function(){
                 "timeTable" : this.timeTable
             },
             url : "./setting/ajax_set_play_data.php",
-            success : function(data) {
-              console.log(data);
+            success : function(data) {              
+              $('#viewRounds').html(data);
               alert("게임 라운드 설정 성공");
-            //  $('h2').css("background-color", "#aaaaaa");
               
               },error:function(request,status,error){
                 alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
             }
         });
   
-}
+}     //GameSetStart.setRoundSetting END
 
 
 
@@ -206,7 +202,7 @@ GameSetStart.prototype.checkPlayerSelNum = function() {
 //게임 플레이어 명단 저장
 GameSetStart.prototype.setStartPlayer = function(){
   this.gamePlayerTable = new Array();
-  var checkPlayerLength = $(".gamePlayerCB").length     //$('#style-3').contents().find("#mailAdd").length;  
+  var checkPlayerLength = $(".gamePlayerCB").length     //$('#style-3').contents().find("#mailAdd").length;//참가 플레이어 수.
   
   for (var i = 0 ; i < checkPlayerLength ; i++) {
     if($(".gamePlayerCB").eq(i).is(":checked")){
@@ -217,6 +213,7 @@ GameSetStart.prototype.setStartPlayer = function(){
   
       $.ajax({
             type : 'POST',
+            dataType: 'json',
             data : {
                 "signal" : "PLAYER",
                 "playerNum" : this.gamePlayerTable.length,
@@ -224,8 +221,68 @@ GameSetStart.prototype.setStartPlayer = function(){
             },
             url : "./setting/ajax_set_play_data.php",
             success : function(data) {
-              console.log(data);
+              console.log(data["inHTML"]);
+              $('#viewPlayers').html(data["inHTML"]);
+              $('#viewPlayerLists').html(data["inModal"]);
               alert("게임 참가자 설정 성공");
+              
+              
+              
+              },error:function(request,status,error){
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+}     //GameSetStart.setStartPlayer END
+
+
+//게임 시작 함수
+GameSetStart.prototype.startGame = function() {
+
+  var gameCode = $("#gameCodeEdit").val();
+  
+  if(gameCode =="게임 명칭 입력"){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+    dd='0'+dd
+    } 
+    
+    if(mm<10) {
+        mm='0'+mm
+    } 
+    
+    today = yyyy+'/'+mm+'/'+dd;
+    gameCode = $('#gameEpisode').text()+" 번째 게임- "+today;
+  }
+  
+  $.ajax({
+            type : 'POST',
+            dataType: 'json',
+            
+            data : {
+              
+                "signal" : "GAMESTART",
+                "gameCode" : gameCode,
+            },
+            url : "./setting/ajax_set_play_data.php",
+            success : function(data) {
+              console.log(data);
+              
+              
+              
+              if(data['returnCode'] == "minPlayerErr"){
+                alert("플레이어 인원이 적습니다.\n 5인 이상 선택 해주세요.");
+              }else if(data['returnCode'] == "minRoundErr"){
+                alert("라운드가 적습니다. 8라운드 이상 설정해주세요 ");
+              }else{
+                alert("게임시작");
+                location.reload();
+              }
+              
+              
+              
               
               },error:function(request,status,error){
                 alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
@@ -233,14 +290,185 @@ GameSetStart.prototype.setStartPlayer = function(){
         });
   
   
+}     //GameSetStart.startGame END
+
+
+
+var GetNowRoundData = function(){
+  this.getRoundData;
+}
+var nowRoundData;
+GetNowRoundData.prototype.setRoundData = function(){
+  $.ajax({
+       type : 'POST',
+       dataType: 'json',
+       async:false,
+       data : {
+           "signal" : "GETENDTIME",
+      //     "gameEpisode" : gameEpisode,
+       },
+       url : "./setting/ajax_player_action.php",
+       success : function(data) {
+         
+         nowRoundData = data;
+         
+         
+         
+         },error:function(request,status,error){
+           alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+       }
+  });
+}
+
+function investTimeOver(){
+  alert("투자 가능 시간이 아닙니다.\n다음 라운드에 시도하세요.");
 }
 
 
-//게임 시작 함수
-GameSetStart.prototype.startGame = function() {
-  
-  
+function investComA(){
+    var invPonit = $(".invPonitA").val();
+    
+    if(invPonit <= 0){
+      console.log(invPonit);
+      alert("0보다 큰 수를 입력해 주세요!");
+      return 0;
+    }
+    
+    $.ajax({
+       type : 'POST',
+       dataType: 'json',
+       data : {
+           "signal" : "investComA",
+           "invPonit" : invPonit,
+       },
+       url : "./setting/ajax_player_action.php",
+       success : function(data) {
+         $(".invPonitA").val(0);
+         console.log(data);
+         if(data['returnCode'] == 'investOK'){
+           alert("투자에 성공하셨습니다.");
+         }else if(data['returnCode'] == 'overCost'){
+           alert("50Point 이하로 투자해 주세요.");
+         }else if(data['returnCode'] == 'overTime'){
+           alert("투자 가능 시간이 아닙니다.\n다음 라운드에 시도하세요.");
+         }else if(data['returnCode'] == 'underCost'){
+           alert("0Point 이하로는 투자 할 수 없습니다.");
+         }
+         
+         },error:function(request,status,error){
+           alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+       }
+  });
 }
+
+
+
+
+var clock_inter, stopwatch_inter, stopwatch_state;
+
+/*------------------------------*/
+/*TIMERS*/
+/*------------------------------*/
+
+
+
+//timer
+var start_time = 0;
+var elapsed_time = 0;
+var requested_time = 0;
+var timer_inter;
+var roundData;
+var endround_time = 0;
+
+var timer = {
+  start: function() {
+    start_time = new Date();
+    $(".comA").on("click", investComA);
+    $(".comA").off("click", investTimeOver);
+    
+    var roundData = new GetNowRoundData();
+    roundData.setRoundData();
+    console.log(nowRoundData);
+    endround_time = new Date(nowRoundData['endRoundTime']);
+    
+    
+    //requested_time = toMs(document.getElementById('timer_h').value, document.getElementById('timer_m').value, document.getElementById('timer_s').value, m * 60 * 1000);
+    requested_time = Gettimers = endround_time.getTime() - start_time.getTime();
+    
+    timer_inter = setInterval(function() {
+      elapsed_time = new Date() - start_time;
+      document.getElementById('clock').innerHTML = toTimeFormat(requested_time - elapsed_time + 1000, 'hh:mm:ss');
+      //+ 1000ms because the seconds are rounded down, so without it when the timer SHOWS 00:00:00, it will have to wait 1s before stopping
+      if (elapsed_time >= requested_time) {
+        timer.stop();
+        timer.end();
+        document.getElementById('clock').innerHTML = "라운드가 종료되었습니다.";
+      }
+    }, 0);
+  },
+  stop: function() {
+    clearInterval(timer_inter);
+    stopSound(timer_sound);
+  },
+  end: function() {
+    $(".comA").off("click", investComA);
+    $(".comA").on("click", investTimeOver);
+    //document.getElementById('clock').innerHTML = '<img src="fin.png" class="alarm-icon" />';
+    playSound(timer_sound);
+  }
+};
+
+/*------------------------------*/
+/*UTILITY*/
+/*------------------------------*/
+
+function toTimeFormat(t, format) {
+
+  function addDigit(n) {
+    return (n < 10 ? '0':'') + n;
+  }
+
+  var ms = t % 1000;
+  t = (t - ms) / 1000;
+  var secs = t % 60;
+  t = (t - secs) / 60;
+  var mins = t % 60;
+  var hrs = (t - mins) / 60;
+  ms = (ms < 10) ? '00' : (ms < 100) ? '0' + Math.floor(ms / 10) : Math.floor(ms / 10);
+
+  if (format === 'hh:mm:ss') {
+    return addDigit(hrs) + ':' + addDigit(mins) + ':' + addDigit(secs);
+  } else if (format === 'mm:ss:msms') {
+    return addDigit(mins) + ':' + addDigit(secs) + ':' + ms;
+  }
+}
+
+function toMs(h, m, s, ms) {
+  return (ms + s * 1000 + m * 1000 * 60 + h * 1000 * 60 * 60);
+}
+
+function getSum(arr) {
+  var a = 0;
+  for (var i = 0; i < arr.length; i++) {
+    a += arr[i];
+  }
+  return a;
+}
+
+/*------------------------------*/
+/*AUDIO*/
+/*------------------------------*/
+var timer_sound = new Audio('round_end.mp3');
+
+function playSound(sound) {
+  sound.play();
+}
+
+function stopSound(sound) {
+  sound.pause();
+  sound.currentTime = 0;
+}
+
 
 
 

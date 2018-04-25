@@ -4,6 +4,17 @@
     include_once 'setting/function.php';
     
     if(isset($_GET['logout']) && $_GET['logout'] == 'yes') logout();
+    
+    if(isset($_SESSION["users"]["auth"]) && $_SESSION["users"]["auth"] == "U"){
+		  $gamePlay = new GamePlay($db_connect, $_SESSION["users"]["id"]);
+		  $isPlaying = $gamePlay->getIsPlaying();
+		  if($isPlaying == 1){
+		    $playerData = $gamePlay->getPlayerData();
+		    $nowRoundData = $gamePlay->GetNowRoundTime();
+		    //print_r($nowRoundData);
+		    //echo $nowRoundData["types"];
+		  }
+		}
 ?>
 
 <!DOCTYPE HTML>
@@ -136,10 +147,15 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 									<div class="user-name">
 										<p><?=$_SESSION["users"]["name"]?></p>
 										<span> 
-										
+
 										<?php 
 										if($_SESSION["users"]["auth"] == "U"){
-										  echo "Player";
+										  if($isPlaying == 1){
+										    echo "Player".$playerData["playerCode"];
+										  }else{
+									  	  echo "User";
+										  }
+										  
 										}else if($_SESSION["users"]["auth"] == "A"){
 										  echo "Administrator";
 										}
@@ -172,17 +188,25 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 		<!-- //header-ends -->
 
 		<?php
+		    
+		    
+		    
 		    //get으로 페이지를 가져오자
 		    if(isset($_GET['page'])){
 		      //페이지 이동화면 -> 권한별로 설정 변경 할것.
 					if($_GET["page"] == 'game_screen') {
-						require_once 'include/game_screen.php';		    //게임 화면
+					  if($isPlaying==1){
+					    require_once 'include/game_screen.php';		    //게임 화면
+					  }else{
+					    require_once 'include/game_ready.php';		    //준비중 화면
+					  }
+						
 					} else if($_GET["page"] == 'notice') {
 						require_once 'include/notice.php';				    //공지사항
 					} else if($_GET["page"] == 'join') {
 						require_once 'include/sing_up.php';				    //회원가입
 					} else if($_GET["page"] == 'dashboard') {
-						require_once 'include/admin_dashboard.php';		//게임 현황판
+						require_once 'include/admin_games.php';		//게임 현황판
 					} else if($_GET["page"] == 'login') {
 						require_once 'include/login.php';				      //로그인
 					}
@@ -193,9 +217,13 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 				    if(!isset($_SESSION["users"]["auth"])){
 				      require_once 'include/login.php';				        //로그인(기본값)
 				    }else if($_SESSION["users"]["auth"] == "U") {
-				      require_once 'include/game_screen.php';				  //게임화면(기본값)
+				      if($isPlaying==1){
+  					    require_once 'include/game_screen.php';		    //게임 화면
+  					  }else{
+  					    require_once 'include/game_ready.php';		    //준비중 화면
+  					  }
 				    }else if($_SESSION["users"]["auth"] == "A") {
-				      require_once 'include/admin_dashboard.php';			//게임 현황판(기본값)
+				      require_once 'include/admin_games.php';			//게임 현황판(기본값)
 				    }
 						
 				}
@@ -203,7 +231,7 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 		
 	<!--footer-->
 	<div class="footer">
-	   <p>&copy; 2018 Glance Design Dashboard. All Rights Reserved.</p>		
+	   <p>&copy; 2018 TAG GAMES. All Rights Reserved.</p>		
 	</div>
     <!--//footer-->
 	</div>
